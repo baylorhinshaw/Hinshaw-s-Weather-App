@@ -1,11 +1,10 @@
 let APIKey = '118453b6b895cca18310865af7751d77';
-let inputCity = document.querySelector('.inputCity')
-let submitButton = document.querySelector('.submitCity')
-let currentCityDisplay = document.querySelector('.currentCityDisplay')
-let fiveDayForecast = document.querySelector('.fivedayforecast')
+let inputCity = document.querySelector('.inputCity');
+let submitButton = document.querySelector('.submitCity');
+let currentCityDisplay = document.querySelector('.currentCityDisplay');
+let fiveDayForecast = document.querySelector('.fivedayforecast');
 
 function getWeather(city) {
-    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals
     var currentDayURL = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=imperial&appid=${APIKey}`
 
     return fetch(currentDayURL)
@@ -25,8 +24,8 @@ function getWeather(city) {
             dateEl.textContent = date;
 
             let weatherIcon = data.weather[0].icon;
-            let weatherIconEl = document.createElement('p');
-            weatherIconEl.textContent = weatherIcon;
+            let weatherIconEl = document.createElement('img');
+            weatherIconEl.src = `https://openweathermap.org/img/wn/${weatherIcon}.png`;
 
             let temperature = data.main.temp;
             let temperatureEl = document.createElement('p');
@@ -57,9 +56,7 @@ function getWeather(city) {
             console.log(temperature);
             console.log(windSpeed);
             console.log(humidity);
-        }
-            // Parse this & update the elements (you can do it here instead of returning or as is and do it down there)
-             )
+        })
 }
 
 
@@ -78,8 +75,8 @@ function getForecast(city) {
             firstDayDateEl.textContent = firstDayDate;
 
             let firstDayIcon = data.list[1].weather[0].icon;
-            let firstDayIconEl = document.createElement('p');
-            firstDayIconEl.textContent = firstDayIcon;
+            let firstDayIconEl = document.createElement('img');
+            firstDayIconEl.src = `https://openweathermap.org/img/wn/${firstDayIcon}.png`;
 
             let firstDayTemp = data.list[1].main.temp;
             let firstDayTempEl = document.createElement('p');
@@ -108,8 +105,8 @@ function getForecast(city) {
             secondDayDateEl.textContent = secondDayDate;
 
             let secondDayIcon = data.list[9].weather[0].icon;
-            let secondDayIconEl = document.createElement('p');
-            secondDayIconEl.textContent = secondDayIcon;
+            let secondDayIconEl = document.createElement('img');
+            secondDayIconEl.src = `https://openweathermap.org/img/wn/${secondDayIcon}.png`;
 
             let secondDayTemp = data.list[9].main.temp;
             let secondDayTempEl = document.createElement('p');
@@ -138,8 +135,8 @@ function getForecast(city) {
             thirdDayDateEl.textContent = thirdDayDate;
 
             let thirdDayIcon = data.list[17].weather[0].icon;
-            let thirdDayIconEl = document.createElement('p');
-            thirdDayIconEl.textContent = thirdDayIcon;
+            let thirdDayIconEl = document.createElement('img');
+            thirdDayIconEl.src = `https://openweathermap.org/img/wn/${thirdDayIcon}.png`;
 
             let thirdDayTemp = data.list[17].main.temp;
             let thirdDayTempEl = document.createElement('p');
@@ -168,8 +165,8 @@ function getForecast(city) {
             forthDayDateEl.textContent = forthDayDate;
 
             let forthDayIcon = data.list[25].weather[0].icon;
-            let forthDayIconEl = document.createElement('p');
-            forthDayIconEl.textContent = forthDayIcon;
+            let forthDayIconEl = document.createElement('img');
+            forthDayIconEl.src = `https://openweathermap.org/img/wn/${forthDayIcon}.png`;
 
             let forthDayTemp = data.list[25].main.temp;
             let forthDayTempEl = document.createElement('p');
@@ -198,8 +195,8 @@ function getForecast(city) {
             fifthDayDateEl.textContent = fifthDayDate;
 
             let fifthDayIcon = data.list[33].weather[0].icon;
-            let fifthDayIconEl = document.createElement('p');
-            fifthDayIconEl.textContent = fifthDayIcon;
+            let fifthDayIconEl = document.createElement('img');
+            fifthDayIconEl.src = `https://openweathermap.org/img/wn/${fifthDayIcon}.png`;
 
             let fifthDayTemp = data.list[33].main.temp;
             let fifthDayTempEl = document.createElement('p');
@@ -223,22 +220,33 @@ function getForecast(city) {
 
             fiveDayForecast.append(fifthDayInfo);
         })
-    // .then((data) => data['weather']); <== just returns the weather.
-    // Parse this & update the elements (you can do it here instead of returning or as is and do it down there)
-
 }
 
 
+let searchHistory = JSON.parse(localStorage.getItem("searchHistory")) || []
+
 submitButton.addEventListener('click', (e) => {
-    getWeather(inputCity.value).then((data) => console.log(data));
-    getForecast(inputCity.value).then((data) => console.log(data));
-    // https://www.w3schools.com/js/js_es6.asp#mark_arrow (es6 arrow syntax for function)
+    currentCityDisplay.textContent = ("");
+    fiveDayForecast.textContent = ("");
+    getWeather(inputCity.value);
+    getForecast(inputCity.value);
+    searchHistory.push(inputCity.value);
+    localStorage.setItem('searchHistory', JSON.stringify(searchHistory))
+    
+    
+    for (let i = 0; i < searchHistory.length; i++) {
+        let historyDiv = document.querySelector('#history')
+        let searchHistoryEl = document.createElement('button')
+        searchHistoryEl.innerHTML = searchHistory[i];
+        historyDiv.appendChild(searchHistoryEl);
+
+        searchHistoryEl.addEventListener('click', (e) => {
+            currentCityDisplay.textContent = ("");
+            fiveDayForecast.textContent = ("");
+            getWeather(searchHistory[i]);
+            getForecast(searchHistory[i]);
+        })
+    }
 });
 
 
-let searchHistory = []
-
-/**
- * searchHistory => array of city names, once you search, append to array and load store in localStorage. Fetch this at the website load.
- * on clicking one of search history cities, trigger same event listener as click
- */
